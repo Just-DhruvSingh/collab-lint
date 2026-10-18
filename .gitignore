@@ -1,0 +1,25 @@
+# Dependencies and build output
+node_modules/
+.next/
+out/
+
+# Environment files and local credentials
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Test output and browser artefacts
+test-results/
+playwright-report/
+blob-report/
+
+# Tooling and OS files
+.DS_Store
+Thumbs.db
+*.log
+*.tsbuildinfo
+
+# Local editor configuration
+.vscode/
+.idea/

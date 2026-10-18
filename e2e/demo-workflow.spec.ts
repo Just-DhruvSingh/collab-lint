@@ -1,0 +1,31 @@
+import { expect, test } from "@playwright/test";
+
+test("demo resolves real findings and confirms only after both societies approve", async ({ page }) => {
+  await page.goto("/app/proposals/demo-prakriti");
+  await expect(page.getByText("4 issues need attention before approval.")).toBeVisible();
+  await expect(page.getByText("Coverage exceeds capacity")).toBeVisible();
+  await expect(page.getByText("Photo quantity exceeds capacity")).toBeVisible();
+  await expect(page.getByText("Delivery deadline is too soon")).toBeVisible();
+  await expect(page.getByText("Collaborative post is missing")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Approve this version" })).toBeDisabled();
+  const numbers = page.locator('input[type="number"]');
+  await numbers.nth(0).fill("2");
+  await numbers.nth(1).fill("15");
+  await numbers.nth(2).fill("48");
+  await page.getByRole("checkbox", { name: "Include one collaborative post" }).check();
+  await expect(page.getByText("Terms are ready for mutual approval.")).toBeVisible();
+  await page.getByRole("button", { name: "Approve this version" }).click();
+  await expect(page.getByText("Approval recorded. Awaiting the partner's approval.")).toBeVisible();
+  await numbers.nth(0).fill("1");
+  await expect(page.getByText("Material change saved as a new version. Earlier approvals were cleared.")).toBeVisible();
+  await expect(page.getByText("No approvals yet. Material edits require both teams to confirm again.")).toBeVisible();
+  await numbers.nth(0).fill("2");
+  await page.getByRole("button", { name: "Approve this version" }).click();
+  await page.locator("select").selectOption({ label: "Campus Photography Society" });
+  await page.getByRole("button", { name: "Approve this version" }).click();
+  await expect(page.getByText(/Both societies approved version \d+\. Agreement confirmed\./)).toBeVisible();
+  await page.goto("/app/agreements");
+  await expect(page.getByText("CL-2026-PRK-001")).toBeVisible();
+  await page.reload();
+  await expect(page.getByText("CL-2026-PRK-001")).toBeVisible();
+});
